@@ -5,14 +5,13 @@ use diesel::{ pg::PgConnection, Connection };
 
 #[derive(Deserialize)]
 pub struct ServerConfig {
-    scheme: String,
-    host: String,
+   
     pub port: u16,
 }
 
 #[derive(Deserialize)]
 pub struct DatabaseConfig {
-    url: String,
+  pub database_url: String,
 }
 
 impl DatabaseConfig {

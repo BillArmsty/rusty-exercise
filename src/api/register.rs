@@ -13,20 +13,25 @@ pub async fn register(
 ) -> Result<HttpResponse, IdentityError> {
     let user: CreateUser = form.into_inner();
 
-    signup(
+    let id = i32::default();
+
+    match signup(
         conn,
         User {
             email: user.email,
             name: user.name,
             hashed_password: user.password.expose_secret().clone(),
-            id: user.id,
-        }).await;
-    Ok(
-        HttpResponse::Ok().json(
-            json!({
-        "msg": "User created successfully",
-        "success": true,
-        })
-        )
+            id,
+        },
     )
+    .await
+    {
+        Ok(_) => Ok(HttpResponse::Ok().json(json!({
+            "msg": "User created successfully",
+            "success": true,
+        }))),
+        Err(e) => Err(IdentityError::UnexpectedError(e)),
+        
+
+    }
 }

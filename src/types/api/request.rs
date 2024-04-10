@@ -8,6 +8,6 @@ pub struct CreateUser {
     pub name : String,
     pub email: String,
     pub password: Secret<String>,
-    pub id : i32,
+    pub id: i32,
 }
 

@@ -5,3 +5,4 @@ pub mod services;
 pub mod types;
 pub mod settings;
 pub mod schema;
+pub mod startup;

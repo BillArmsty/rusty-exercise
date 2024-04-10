@@ -1,11 +1,8 @@
-use actix_session::{ storage::RedisSessionStore, SessionMiddleware };
-use actix_web::{ cookie::{ Key, SameSite }, dev::Server, web, App, HttpServer };
+use actix_web::{ dev::Server, web, App, HttpServer };
 
-use tracing_actix_web::TracingLogger;
-use secrecy::{ ExposeSecret, Secret };
-use diesel::pg::{ PgConnection, PgConnectionOptions };
+use diesel::{ pg::PgConnection, Connection };
 
-use crate::{ api::{ login, signup }, settings::{ Settings, DatabaseConfig } };
+use crate::{ api::{login, register}, settings::{ Settings, DatabaseConfig } };
 
 pub struct Application {
     port: u16,
@@ -14,9 +11,9 @@ pub struct Application {
 
 impl Application {
     pub async fn build(config: Settings) -> Result<Self, std::io::Error> {
-        let pool = get_connection_pool(&config.database)?;
+        let pool = get_connection_pool(&config.database).expect("Failed to connect to database.");
 
-        let server = run(config.server.port, pool)?.await.expect("Server failed to start");
+        let server = run(pool, config.server.port).await?;
 
         Ok(Self {
             port: config.server.port,
@@ -32,25 +29,19 @@ impl Application {
 pub fn get_connection_pool(
     config: &DatabaseConfig
 ) -> Result<PgConnection, diesel::ConnectionError> {
-    let options = PgConnectionOptions::new().connect(&config.url)?;
+    let options = config.database_url.clone();
     Ok(PgConnection::establish(&options)?)
 }
 
+
 pub async fn run(conn: PgConnection, port: u16) -> Result<Server, std::io::Error> {
+    let pool = web::Data::new(conn);
     let server = HttpServer::new(move || {
         App::new()
-            // enable logger
-            .wrap(TracingLogger::default())
-            .wrap(
-                SessionMiddleware::builder(store.clone(), secret_key.clone())
-                    // allow the cookie to be accessed from JavaScript
-                    .cookie_http_only(false)
-                    // allow the cookie only from  the current domain
-                    .cookie_same_site(SameSite::Strict)
-                    .build()
-            )
-            .route("/signup", web::post().to(signup))
+
+            .route("/signup", web::post().to(register))
             .route("/login", web::post().to(login))
+            .app_data(pool.clone())
     }).run();
     Ok(server)
 }

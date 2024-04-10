@@ -6,6 +6,9 @@
 
 use chrono::NaiveDateTime;
 use uuid::Uuid;
+use diesel::Queryable;
+
+
 #[derive(Queryable, Debug)]
 pub struct Confirmation {
     pub id: Uuid,
@@ -15,7 +18,7 @@ pub struct Confirmation {
 
 #[derive(Queryable, Debug)]
 pub struct Userr {
-    pub id: i32,
+    pub id: Uuid,
     pub name: String,
     pub email: String,
     pub password: String,

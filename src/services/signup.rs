@@ -10,6 +10,6 @@ pub async fn signup(
 ) -> Result<(), anyhow::Error> {
 
     let pool = conn;
-    register_user(pool, &user).await;
+    let _ = register_user(pool, &user).await;
     Ok(())
 }

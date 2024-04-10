@@ -1,0 +1,11 @@
+[server]
+host = "localhost"
+port = 8080
+scheme = "http"
+
+[database]
+host = "localhost"
+port = 8080
+username = "postgres"
+password = "password"
+name = "rusty_exercise"

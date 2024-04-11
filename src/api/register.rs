@@ -1,28 +1,24 @@
 use actix_web::{ web, HttpResponse };
-use secrecy::ExposeSecret;
+use anyhow::Context;
 use serde_json::json;
-use crate::{ services::signup, types::User };
+use crate::{ services::signup, types::{PgPool, User} };
 
-use diesel::prelude::*;
 
 use crate::types::{ request::CreateUser, response::IdentityError };
 
 pub async fn register(
-    conn: &mut PgConnection,
+    pool: web::Data<PgPool>,
     form: web::Form<CreateUser>
 ) -> Result<HttpResponse, IdentityError> {
-    let user: CreateUser = form.into_inner();
 
-    let id = i32::default();
+    let user: User = form.into_inner().try_into()?;
+
+
+    let mut connection = pool.get().context("Failed to get database connection")?;
 
     match signup(
-        conn,
-        User {
-            email: user.email,
-            name: user.name,
-            hashed_password: user.password.expose_secret().clone(),
-            id,
-        },
+        &mut connection,
+       user
     )
     .await
     {

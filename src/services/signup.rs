@@ -1,15 +1,13 @@
+use crate::types::PooledConnection;
 use crate::{ types::User, repository::register_user };
 
 
-use diesel::prelude::*;
-use diesel::{ self };
 
 pub async fn signup(
-    conn: &mut PgConnection,
+    connection: &mut PooledConnection,
     user: User
 ) -> Result<(), anyhow::Error> {
 
-    let pool = conn;
-    let _ = register_user(pool, &user).await;
+    let _ = register_user(connection, &user).await;
     Ok(())
 }

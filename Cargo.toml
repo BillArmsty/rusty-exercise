@@ -8,11 +8,9 @@ edition = "2021"
 [dependencies]
 actix-web = "4.0"
 diesel = { version = "2.1.5", features = ["postgres", "r2d2",  "chrono"] }
-dotenvy = "0.15"
 r2d2 = "0.8.10"
 anyhow = "1.0.40"
 reqwest = "0.12.3"
-config = { version = "0.14.0", default-features = false, features = ["toml"] }
 chrono = { version = "0.4.26", default-features = false, features = ["clock"] }
 thiserror = "1.0.44"
 rand = "0.8.5"
@@ -25,6 +23,7 @@ serde_json = "1.0.103"
 uuid = { version = "1.8.0", features = ["v4", "serde"] }
 actix-session = "0.9.0"
 tracing-actix-web = "0.7.5"
+envy = "0.4.2"
 
 [dev-dependencies]
 claims = "0.7.1"

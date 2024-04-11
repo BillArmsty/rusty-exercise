@@ -21,7 +21,6 @@ pub enum AuthError {
     NoEmailSet,
     NoNameSet,
     NoPasswordSet,
-    EnvironmentError(dotenvy::Error),
     Argon2Error(argon2::password_hash::Error),
     DatabaseError(diesel::result::Error),
     ConversionError(std::string::FromUtf8Error),
@@ -45,9 +44,5 @@ impl From<std::string::FromUtf8Error> for AuthError {
     }
 }
 
-impl From<dotenvy::Error> for AuthError {
-    fn from(e: dotenvy::Error) -> Self {
-        AuthError::EnvironmentError(e)
-    }
-}
+
 

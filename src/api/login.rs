@@ -1,9 +1,7 @@
 use actix_session::Session;
 use actix_web::{ web, HttpResponse };
 use argon2::{ Argon2, PasswordHash, PasswordVerifier };
-use dotenvy::dotenv;
 use serde_json::json;
-use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use secrecy::{ ExposeSecret, Secret };
 // use uuid::Uuid;
@@ -13,6 +11,7 @@ use crate::schema::users::dsl::*;
 use crate::schema::users;
 
 use crate::types::response::IdentityError;
+use crate::types::{PgPool, PooledConnection};
 // use crate::types::User;
 use anyhow::Context;
 
@@ -37,7 +36,7 @@ pub struct User {
 
 pub async fn login(
     form: web::Form<FormData>,
-    pool: &mut PgConnection,
+    pool: web::Data<PgPool>,
     session: Session
 ) -> Result<HttpResponse, IdentityError> {
     let credentials = Credentials {
@@ -45,7 +44,9 @@ pub async fn login(
         password: form.password.clone(),
     };
 
-    match validate_credentials(credentials, pool).await {
+    let mut connection = pool.get().unwrap();
+
+    match validate_credentials(credentials, &mut connection).await {
         Ok(user_id) => {
             session.renew();
             session
@@ -67,7 +68,7 @@ pub async fn login(
 
 async fn validate_credentials(
     credentials: Credentials,
-    connection: &mut PgConnection
+    connection: &mut PooledConnection
 ) -> Result<User, IdentityError> {
     
     let stored_credentials = get_stored_credentials(&credentials.email, connection)
@@ -96,7 +97,7 @@ async fn validate_credentials(
 
 fn get_stored_credentials(
     email_param: &String,
-    connection: &mut PgConnection
+    connection: &mut PooledConnection
 ) -> Result<Option<(i32, String)>, anyhow::Error> {
     let result = users::table
         .filter(email.eq(email_param))
@@ -118,7 +119,6 @@ fn verify_password(
     password: Secret<String>,
     password_hash: Secret<String>
 ) -> Result<(), anyhow::Error> {
-    dotenv().ok();
 
     let argon2 = Argon2::default();
     let parsed_hash = PasswordHash::new(&password_hash.expose_secret()).expect(

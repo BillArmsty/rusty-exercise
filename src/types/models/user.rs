@@ -26,7 +26,7 @@ pub struct Userr {
 
 #[derive(Queryable, Debug)]
 pub struct User {
-    pub id: i32,
+    pub id: Uuid,
     pub email: String,
     pub name: String,
     pub hashed_password: String,

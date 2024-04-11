@@ -1,5 +1,5 @@
 CREATE TABLE userrs (
-    id SERIAL PRIMARY KEY,
+    id uuid PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL

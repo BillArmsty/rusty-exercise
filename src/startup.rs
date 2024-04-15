@@ -62,7 +62,7 @@ pub async fn run(pool: PgPool, listener: TcpListener) -> Result<Server, std::io:
                 SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
                     .cookie_http_only(false)
                     .cookie_same_site(SameSite::Strict)
-                    .cookie_secure(true)
+                    .cookie_secure(false)
                     .build()
             )
 

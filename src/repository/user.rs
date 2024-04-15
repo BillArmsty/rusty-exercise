@@ -3,7 +3,8 @@ use crate::types::User;
 
 use diesel::{
     self,
-    insert_into, sql_query,
+    insert_into,
+    //  sql_query,
     //  sql_types::Uuid
 };
 use crate::schema::users;
@@ -54,10 +55,6 @@ pub async fn fetch_all_users(
     //  user_id: Uuid
 ) -> Result<Vec<User>, AuthError> {
 
-    // let users = sql_query("SELECT * FROM users").execute(conn)
-    //     .map_err(|err| AuthError::DatabaseError(err))?;
-
-    // println!("{:?}", users);
 
     let user_list  =  users::table.load::<User>(conn)
         .map_err(|err| AuthError::DatabaseError(err))?;

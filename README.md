@@ -58,4 +58,4 @@ Response:
 
 
 
-This readme should give a clear overview of the project, how to set it up, and how to use the API endpoints while adhering to the given requirements. Let me know if you need further adjustments or details!
+This readme should give a clear overview of the project, how to set it up, and how to use the API endpoints while adhering to the given requirements. 

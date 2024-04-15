@@ -1,6 +1,6 @@
 .vscode/
 target/
-.env
+.env*
 .gitignore
 compose.yml
 Dockerfile

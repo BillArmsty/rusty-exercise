@@ -1,5 +1,11 @@
-use crate::{ helpers::AuthError, types::User };
-use diesel::{ self, insert_into };
+use crate::helpers::AuthError;
+use crate::types::User;
+
+use diesel::{
+    self,
+    insert_into, sql_query,
+    //  sql_types::Uuid
+};
 use crate::schema::users;
 
 use argon2::{
@@ -9,15 +15,15 @@ use argon2::{
 };
 
 use diesel::prelude::*;
-pub async fn register_user(conn: &mut PgConnection, user: &User) -> Result<(), AuthError> {
+
+#[tracing::instrument(name = "Register a new user", skip_all)]
+pub async fn create_user(conn: &mut PgConnection, user: &User) -> Result<(), AuthError> {
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
 
-    // Hash the password
     let password_hash_result = argon2.hash_password(user.hashed_password.as_bytes(), &salt)?;
     let password_hash_str = password_hash_result.to_string();
 
-    // Parse password hash string into PasswordHash struct
     let _password_hash = match PasswordHash::new(&password_hash_str) {
         Ok(hash) => hash,
         Err(err) => {
@@ -25,13 +31,37 @@ pub async fn register_user(conn: &mut PgConnection, user: &User) -> Result<(), A
         }
     };
 
-    // Insert user into the database
     match
         insert_into(users::table)
-            .values((users::email.eq(&user.email), users::hashed_password.eq(&password_hash_str)))
+            .values((
+                users::id.eq(&user.id),
+                users::name.eq(&user.name),
+                users::email.eq(&user.email),
+                users::hashed_password.eq(&password_hash_str),
+            ))
             .execute(conn)
     {
         Ok(_) => Ok(()),
         Err(err) => Err(AuthError::DatabaseError(err)),
     }
+}
+
+
+
+#[tracing::instrument(name = "Fetch all registered users", skip_all)]
+pub async fn fetch_all_users(
+    conn: &mut PgConnection
+    //  user_id: Uuid
+) -> Result<Vec<User>, AuthError> {
+
+    // let users = sql_query("SELECT * FROM users").execute(conn)
+    //     .map_err(|err| AuthError::DatabaseError(err))?;
+
+    // println!("{:?}", users);
+
+    let user_list  =  users::table.load::<User>(conn)
+        .map_err(|err| AuthError::DatabaseError(err))?;
+
+
+    Ok(user_list)
 }

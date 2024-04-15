@@ -1,5 +1,5 @@
 use crate::types::PooledConnection;
-use crate::{ types::User, repository::register_user };
+use crate::{ types::User, repository::create_user };
 
 
 
@@ -8,6 +8,6 @@ pub async fn signup(
     user: User
 ) -> Result<(), anyhow::Error> {
 
-    let _ = register_user(connection, &user).await;
+    let _ = create_user(connection, &user).await;
     Ok(())
 }

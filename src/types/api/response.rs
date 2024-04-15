@@ -4,7 +4,7 @@ use serde_json::json;
 use crate::helpers::error_chain_fmt;
 
 #[derive(thiserror::Error)]
-pub enum IdentityError {
+pub enum  IdentityError {
     #[error("{0}")] ValidationError(String),
     #[error("Invalid credentials")] InvalidCredentials(#[source] anyhow::Error),
     #[error(transparent)] UnexpectedError(#[from] anyhow::Error),

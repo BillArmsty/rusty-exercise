@@ -1,6 +1,6 @@
-CREATE TABLE userrs (
-    id uuid PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL
-)
+CREATE TABLE users (
+  id UUID PRIMARY KEY,
+  email VARCHAR NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  hashed_password TEXT NOT NULL
+);

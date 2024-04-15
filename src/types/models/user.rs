@@ -3,11 +3,12 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-
+// use 
 use chrono::NaiveDateTime;
+use serde::Serialize;
 use uuid::Uuid;
-use diesel::Queryable;
-
+use diesel::{ sql_types::SqlType, QueryId, Queryable, Selectable, QueryableByName };
+// use diesel::query_builder::SqlQuery;
 
 #[derive(Queryable, Debug)]
 pub struct Confirmation {
@@ -15,20 +16,10 @@ pub struct Confirmation {
     pub email: String,
     pub expires_at: NaiveDateTime,
 }
-
-#[derive(Queryable, Debug)]
-pub struct Userr {
-    pub id: Uuid,
-    pub name: String,
-    pub email: String,
-    pub password: String,
-}
-
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, QueryId, SqlType, Serialize, PartialEq)]
 pub struct User {
     pub id: Uuid,
     pub email: String,
     pub name: String,
     pub hashed_password: String,
 }
-

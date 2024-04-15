@@ -1,4 +1,4 @@
-FROM rust:alpine as builder
+FROM rust as builder
 
 WORKDIR /app
 
@@ -13,9 +13,10 @@ COPY . .
 RUN cargo build --release
 
 
-FROM alpine:latest as runtime
+FROM rust as runtime
 
+WORKDIR /app
 
-COPY --from=builder /app/target/release/rusty_exercise /app/rusty_exercise
+COPY --from=builder /app/target/release/rusty_exercise .
 
 ENTRYPOINT ["/app/rusty_exercise"]

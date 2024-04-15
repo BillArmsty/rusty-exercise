@@ -1,12 +1,15 @@
 use std::net::TcpListener;
+use tracing_actix_web::TracingLogger;
 
-use actix_web::{ dev::Server, web, App, HttpServer };
+use actix_web::{ cookie::{ Key, SameSite }, dev::Server, web, App, HttpServer };
+
+use actix_session::{ storage::CookieSessionStore, SessionMiddleware };
 
 use anyhow::Context;
 use diesel::{ pg::PgConnection, r2d2::ConnectionManager };
 use r2d2::Pool;
 
-use crate::{ api::{ login, register }, Config, types::PgPool };
+use crate::{ api::{ login, logout_user, register, get_users }, types::PgPool, Config };
 
 pub struct Application {
     port: u16,
@@ -39,7 +42,6 @@ impl Application {
 }
 
 pub fn get_connection_pool(database_url: &str) -> PgPool {
-
     let manager = ConnectionManager::<PgConnection>::new(database_url);
 
     let pool = Pool::builder().build(manager).expect("Failed to create connection pool.");
@@ -50,14 +52,27 @@ pub fn get_connection_pool(database_url: &str) -> PgPool {
 pub async fn run(pool: PgPool, listener: TcpListener) -> Result<Server, std::io::Error> {
     let pool = web::Data::new(pool);
 
+    let secret_key = Key::generate();
+
     let server = HttpServer::new(move || {
         App::new()
 
+            .wrap(TracingLogger::default())
+            .wrap(
+                SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
+                    .cookie_http_only(false)
+                    .cookie_same_site(SameSite::Strict)
+                    .cookie_secure(true)
+                    .build()
+            )
+
             .route("/signup", web::post().to(register))
             .route("/login", web::post().to(login))
+            .route("/logout", web::get().to(logout_user))
+            .route("/users", web::get().to(get_users))
             .app_data(pool.clone())
     })
-    .listen(listener)?
-    .run();
+        .listen(listener)?
+        .run();
     Ok(server)
 }

@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: backend
+    env_file:
+      - .env.mainnet
     ports:
       - "8080:8080"
     depends_on:
@@ -15,11 +17,13 @@ services:
     container_name: postgres
     ports:
       - "5432:5432"
+    volumes:
+      - ./migrations/2024-04-09-133747_create_user/up.sql:/docker-entrypoint-initdb.d/up.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
+      interval: 5s
       retries: 5
-      start_period: 10s
+      start_period: 5s
 
     env_file:
       - .env

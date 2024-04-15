@@ -33,8 +33,8 @@ Request Body:
   "password": "securepassword"
 }
 
-#### Log in user
-#### POST /login
+### Log in user
+### POST /login
 
 Request Body:
 

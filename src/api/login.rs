@@ -133,6 +133,7 @@ async fn get_stored_credentials(
         .select((users::id, users::hashed_password))
         .first::<(Uuid, String)>(connection)
         .optional()
+        
         .map_err(|e| e.into());
 
     match result {

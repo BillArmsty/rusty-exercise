@@ -1,12 +1,7 @@
 use crate::helpers::AuthError;
 use crate::types::User;
 
-use diesel::{
-    self,
-    insert_into,
-    //  sql_query,
-    //  sql_types::Uuid
-};
+use diesel::{ self, insert_into };
 use crate::schema::users;
 
 use argon2::{
@@ -47,18 +42,12 @@ pub async fn create_user(conn: &mut PgConnection, user: &User) -> Result<(), Aut
     }
 }
 
-
-
 #[tracing::instrument(name = "Fetch all registered users", skip_all)]
 pub async fn fetch_all_users(
     conn: &mut PgConnection
     //  user_id: Uuid
 ) -> Result<Vec<User>, AuthError> {
-
-
-    let user_list  =  users::table.load::<User>(conn)
-        .map_err(|err| AuthError::DatabaseError(err))?;
-
+    let user_list = users::table.load::<User>(conn).map_err(|err| AuthError::DatabaseError(err))?;
 
     Ok(user_list)
 }

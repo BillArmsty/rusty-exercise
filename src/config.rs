@@ -4,19 +4,12 @@ use anyhow::Context;
 use secrecy::Secret;
 use serde::Deserialize;
 
-// #[derive(Deserialize, Debug)]
-// pub struct LogConfig {
-//     pub level: String,
-// }
-
-
-
-#[derive(Debug, Deserialize)]
+#[derive( Deserialize)]
 pub struct Config {
     pub database_url: String,
     pub host: String,
     pub port: u16,
-    // pub log: LogConfig,
+    pub log: String,
     pub secret_key: Secret<String>,
     pub domain_url: String,
 }

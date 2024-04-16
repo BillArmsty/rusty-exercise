@@ -23,11 +23,6 @@ use crate::types::{ PgPool, PooledConnection };
 use anyhow::Context;
 use std::fmt;
 
-// #[derive(Debug, Clone, Copy, Default, QueryId, SqlType)]
-// pub struct SessionDetails {
-//     user_id: Uuid,
-// }
-
 #[derive(serde::Deserialize)]
 pub struct FormData {
     email: String,
@@ -40,8 +35,6 @@ pub struct Credentials {
 }
 
 #[derive(Queryable, Identifiable, Debug, PartialEq, Eq, Clone, Serialize)]
-// #[derive(Debug, Clone, Default, QueryId, SqlType, Serialize, Identifiable, PartialEq, Eq)]
-// #[diesel(postgres_type(oid = 2950, array_oid = 2951))]
 pub struct User {
     pub id: Uuid,
     pub email: String,
@@ -164,6 +157,7 @@ fn verify_password(
         .map_err(|_| anyhow::anyhow!("Invalid password"))
 }
 
+#[tracing::instrument(name = "Logging out a user", skip(session))]
 pub async fn logout_user(session: Session) -> HttpResponse {
     if check_auth(&session).is_err() {
         return HttpResponse::Unauthorized().body("User not authenticated");
